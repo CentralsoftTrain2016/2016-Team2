@@ -1,0 +1,39 @@
+package domain;
+
+import domain.value.INFORMATIONDESCRIPTION;
+import domain.value.INFORMATIONID;
+import domain.value.INFORMATIONNUMBER;
+
+public class DictionaryItem {
+
+	private INFORMATIONID INFORMATIONID;
+	private INFORMATIONNUMBER INFORMATIONNUMBER;
+	private INFORMATIONDESCRIPTION DESCRIPTION;
+
+	// GETTER--------------------------------------------------------------
+	public INFORMATIONID getINFORMATIONID() {
+		return INFORMATIONID;
+	}
+
+	public INFORMATIONNUMBER getINFORMATIONNUMBER() {
+		return INFORMATIONNUMBER;
+	}
+
+	public INFORMATIONDESCRIPTION getDESCRIPTION() {
+		return DESCRIPTION;
+	}
+
+	// SETTER--------------------------------------------------------------
+	public void setINFORMATIONID(INFORMATIONID iNFORMATIONID) {
+		INFORMATIONID = iNFORMATIONID;
+	}
+
+	public void setINFORMATIONNUMBER(INFORMATIONNUMBER iNFORMATIONNUMBER) {
+		INFORMATIONNUMBER = iNFORMATIONNUMBER;
+	}
+
+	public void setDESCRIPTION(INFORMATIONDESCRIPTION dESCRIPTION) {
+		DESCRIPTION = dESCRIPTION;
+	}
+
+}

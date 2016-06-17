@@ -1,0 +1,23 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<jsp:useBean id="userName" class="java.lang.String" scope="request" />
+<jsp:useBean id="password" class="java.lang.String" scope="request" />
+<jsp:useBean id="message1" class="java.lang.String" scope="request" />
+<jsp:useBean id="message2" class="java.lang.String" scope="request" />
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>機雷掃除人 新規登録</title>
+</head>
+<body bgcolor="#FFFFFF">
+<center><h1><font face="Magneto">－新規登録－</font></h1></center>
+<br>
+<form  method="POST" action="NewUserRegistrationServlet">
+<center>    ID：<input name="userName" type="text" ><br></center><center> <%=message1 %> <br></center>
+<center>    PASS：<input name="password" type="text" ><br></center><center>  <%=message2 %> <br></center>
+<center>	<input type="submit" value="登録" style="width:120px; height:60px"></center>
+</form>
+</body>
+</html>

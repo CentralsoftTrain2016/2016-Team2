@@ -1,0 +1,359 @@
+package dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import domain.Mass;
+import domain.value.AROUNDMINES;
+import domain.value.GAMEID;
+import domain.value.ISEXISTMINE;
+import domain.value.ISOPEN;
+import domain.value.ITEMID;
+import domain.value.MASSID;
+import domain.value.QUIZID;
+
+
+public class MassDao extends Dao {
+
+	/**
+	 * コンストラクタ
+	 * @param con
+	 */
+	public MassDao(Connection con){
+		super(con);
+	}
+
+
+	/**
+	 * マスのデータを取得します
+	 * @param massID マスID
+	 * @param gameID ゲームID
+	 * @return マスのデータ
+	 * @throws SQLException
+	 */
+	public Mass getMass(int massID, int gameID) throws SQLException{
+		  PreparedStatement stmt = null;
+		  ResultSet rset = null;
+		  Mass ms = null;
+		  try{
+			/* Statementの作成 */
+			stmt = con.prepareStatement(
+						  " select "
+						+ "   *"
+						+ " from "
+						+ "   MASS "
+						+ " where "
+						+ "   MASSID = ? "
+						+ "   and "
+						+ "   GAMEID = ?");
+
+			stmt.setInt(1, massID);
+			stmt.setInt(2, gameID);
+			/* ｓｑｌ実行 */
+			rset = stmt.executeQuery();
+			/* 取得したデータをmsに格納します。 */
+			while (rset.next())
+				{
+					ms = new Mass();
+					ms.setMASSID(new MASSID(rset.getInt(1)));			//各変数のコンストラクタ内で数値を定義している。
+					ms.setGAMEID( new GAMEID(rset.getInt(2)));
+					ms.setISEXISTMINE( new ISEXISTMINE(rset.getBoolean(3)));
+					ms.setAROUNDMINES(new AROUNDMINES(rset.getInt(4)));
+					ms.setISOPEN(new ISOPEN(rset.getBoolean(5)));
+					ms.setQUIZID(new QUIZID(rset.getInt(6)));
+					ms.setITEMID(new ITEMID(rset.getInt(7)));
+				}
+		  }
+
+		catch (SQLException e) {
+			throw e;
+		}
+		finally{
+			if(stmt != null){
+			  stmt.close();
+			  stmt = null;
+			}
+			if(rset != null){
+			  rset.close();
+			  rset = null;
+			}
+		}
+
+		return ms;
+	} //ここまで getMass メソッド
+
+
+	/**
+	 * マスを生成します。
+	 * @param massList 16x16フィールド上のマス
+	 * @throws SQLException
+	 */
+	public void createMass(List<Mass> massList) throws SQLException {
+
+		int i = 0;
+
+		while (i < massList.size()) {
+			int massID = massList.get(i).getMASSID().get();
+			int gameID = massList.get(i).getGAMEID().get();
+			boolean isExistMine = massList.get(i).getISEXISTMINE().get();
+			int arountMines = massList.get(i).getAROUNDMINES().get();
+			boolean isOpen = massList.get(i).getISOPEN().get();
+			int quizID = massList.get(i).getQUIZID().get();
+			int itemID = massList.get(i).getITEMID().get();
+			i++;
+
+			PreparedStatement stmt = null;
+
+			try{
+				/* Statementの作成 */
+				stmt = con.prepareStatement(
+						  "insert "
+					    + "   into MASS "
+						+ "("
+						+ "    	 MASSID "
+						+ "    	,GAMEID "
+						+ "   	,ISEXISTMINE "
+						+ "   	,AROUNDMINES "
+						+ "   	,ISOPEN "
+						+ "   	,QUIZID "
+						+ "   	,ITEMID "
+						+ ")"
+						+ "values "
+						+ "("
+						+ " 	 ?"
+						+ " 	,?"
+						+ "		,?"
+						+ "		,?"
+						+ "		,?"
+						+ "		,?"
+						+ "		,?"
+						+ ")"
+						);
+
+				//SQL文に代入
+				stmt.setInt(1, massID);
+				stmt.setInt(2, gameID);
+				stmt.setBoolean(3, isExistMine);
+				stmt.setInt(4, arountMines);
+				stmt.setBoolean(5, isOpen);
+				stmt.setInt(6, quizID);
+				stmt.setInt(7, itemID);
+
+
+				/* ｓｑｌ実行 */
+				int lineCount = stmt.executeUpdate();
+				if (lineCount != 1) {
+					throw new SQLException("登録できません. ID:" + massID);
+				}
+
+			} catch (SQLException e) {
+				throw e;
+			} finally {
+				if (stmt != null) {
+					try {
+						stmt.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					}
+					stmt = null;
+				}
+			}
+		}
+	}
+
+
+//-----------------------------------------
+	/*ISOPEN更新用のSQL文*/
+	private static final String ISOPEN_SQL =
+			" UPDATE "
+			+ "   MASS"
+			+ " SET "
+			+ "    ISOPEN = '1' "
+			+ "  WHERE"
+			+ "    MASSID = ?"
+			+ "  and  "
+			+ "    GAMEID = ?";
+
+	/**
+	 * MASSのISOPENをtrueに変えるSQLメソッド
+	 * @param massID マスID
+	 * @param gameID ゲームID
+	 * @throws SQLException
+	 */
+	public void updateISOPEN(int massID, int gameID) throws SQLException{
+		PreparedStatement stmt = null;
+		try{
+			/* Statementの作成 */
+			stmt = con.prepareStatement( ISOPEN_SQL);
+			stmt.setInt(1, massID);
+			stmt.setInt(2, gameID);
+			/* ｓｑｌ実行 */
+			int lineCount = stmt.executeUpdate();
+			if( lineCount != 1 )
+			{
+				throw new SQLException("更新するマスがありません. ID:" + massID);
+			}
+		}
+		finally{
+			if(stmt != null){
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					throw e;
+				}
+				stmt = null;
+			}
+		}
+	}
+
+	public void resetIsOpen(){
+
+	}
+
+
+	/**
+	 * すべてのMASSのISOPENをtrueに変えるSQLメソッド
+	 * @param gameID ゲームID
+	 * @throws SQLException
+	 */
+	public void updateAllISOPEN(int gameID) throws SQLException{
+		PreparedStatement stmt = null;
+		try{
+			/* Statementの作成 */
+			stmt = con.prepareStatement(
+					" UPDATE "
+					+ "   MASS"
+					+ " SET "
+					+ "    ISOPEN = '1' "
+					+ "  WHERE"
+					+ "    GAMEID = ?");
+			stmt.setInt(1, gameID);
+			/* ｓｑｌ実行 */
+			stmt.executeUpdate();
+//			if( stmt.executeUpdate() != 1 )
+//			{
+//				throw new SQLException("更新するゲームデータがありません");
+//			}
+		}
+		finally{
+			if(stmt != null){
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					throw e;
+				}
+				stmt = null;
+			}
+		}
+	}
+
+
+	/**
+	 * ゲームIDに対応するすべてのMASSデータを返すSQLメソッド
+	 * @param gameID ゲームID
+	 * @throws SQLException
+	 */
+	public List<Mass> getAllMass(int gameID) throws SQLException{
+		PreparedStatement stmt = null;
+		 ResultSet rset = null;
+		 List<Mass> allmasslist = new ArrayList<Mass> ();
+		try{
+
+			/* Statementの作成 */
+			stmt = con.prepareStatement(
+					  " select "
+					+ "   *"
+					+ " from "
+					+ "   MASS "
+					+ " where "
+					+ "   GAMEID = ?");
+			stmt.setInt(1, gameID);
+
+			/* ｓｑｌ実行 */
+			rset = stmt.executeQuery();
+
+			while (rset.next()){
+
+				Mass mass = new Mass();
+				mass.setMASSID(new MASSID(rset.getInt(1)));
+				mass.setGAMEID(new GAMEID(rset.getInt(2)));
+				mass.setISEXISTMINE(new ISEXISTMINE(rset.getBoolean(3)));
+				mass.setAROUNDMINES(new AROUNDMINES(rset.getInt(4)));
+				mass.setISOPEN(new ISOPEN (rset.getBoolean(5)));
+				mass.setQUIZID(new QUIZID(rset.getInt(6)));
+				mass.setITEMID(new ITEMID(rset.getInt(7)));
+				allmasslist.add(mass);
+
+			}
+		}
+
+		finally{
+			if(stmt != null){
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					throw e;
+				}
+				stmt = null;
+			}
+		}
+		return allmasslist;
+	}
+
+
+	/**
+	 * MASSが地雷マス以外全マス開放されたかチェックするメソッド
+	 * MASSのをISOPEN=falseかつISEXISTMINE=falseがnullならtrueを返却
+	 * @param massID マスID
+	 * @param gameID ゲームID
+	 * @throws SQLException
+	 */
+	public boolean isAllMassClear(GAMEID gameID) throws SQLException{
+		  PreparedStatement stmt = null;
+		  ResultSet rset = null;
+		  try{
+			/* Statementの作成 */
+			stmt = con.prepareStatement(
+						  " select "
+						+ "   *"
+						+ " from "
+						+ "   MASS "
+						+ " where "
+						+ "   GAMEID = ?"
+						+ "   and "
+						+ "   ISOPEN = '0'  "
+						+ "   and "
+						+ "   ISEXISTMINE = '0'  ");
+
+			stmt.setInt(1, gameID.get());
+			rset = stmt.executeQuery();
+
+			//rsetがnullなら
+			if(rset.next())	return false;
+			//if(stmt.executeQuery() == null)	return true;
+			else return true;
+
+		  }finally{
+			  if (stmt != null) {
+				  try {
+					  stmt.close();
+				  } catch (SQLException e) {
+					  e.printStackTrace();
+					  throw new RuntimeException(e);
+				  }
+				  stmt = null;
+			  }
+		  }
+	}
+
+
+}
+

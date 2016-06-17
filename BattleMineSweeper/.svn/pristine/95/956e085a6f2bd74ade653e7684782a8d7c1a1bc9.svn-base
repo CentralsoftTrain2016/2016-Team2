@@ -1,0 +1,38 @@
+package domain;
+
+import domain.value.EFFICACY;
+import domain.value.ITEMID;
+import domain.value.ITEMNAME;
+
+public class Item {
+
+	private ITEMID ITEMID;
+	private ITEMNAME ITEMNAME;
+	private EFFICACY EFFICACY;
+
+	// GETTER-------------------------------------
+	public ITEMID getITEMID() {
+		return ITEMID;
+	}
+
+	public ITEMNAME getITEMNAME() {
+		return ITEMNAME;
+	}
+
+	public EFFICACY getEFFICACY() {
+		return EFFICACY;
+	}
+
+	// SETTER-------------------------------------
+	public void setITEMID(ITEMID iTEMID) {
+		ITEMID = iTEMID;
+	}
+
+	public void setITEMNAME(ITEMNAME iTEMNAME) {
+		ITEMNAME = iTEMNAME;
+	}
+
+	public void setEFFICACY(EFFICACY eFFICACY) {
+		EFFICACY = eFFICACY;
+	}
+}

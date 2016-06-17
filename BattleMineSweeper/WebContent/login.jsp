@@ -1,0 +1,29 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<jsp:useBean id="message1" class="java.lang.String" scope="request" />
+<jsp:useBean id="message2" class="java.lang.String" scope="request" />
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>機雷掃除人 ログイン</title>
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000ff" vlink="#800080" alink="#ff0000">
+<Div Align="center"><img src="logoImg/logo.png" alt="機雷掃除人ロゴ" widht="150" height="150"></Div>
+<br>
+<form  method="POST" action="LoginLoginServlet">
+<Div Align="center">I D ：<input name="userName" type="text" > <br></Div><Div Align="center"><%=message1 %> <br></Div>
+<Div Align="center">PASS：<input name="password" type="text" > <br></Div><Div Align="center"><%=message2 %> <br></Div>
+<center>	<input type="submit" value="ログイン"><br></center>
+</form>
+<br>
+<br>
+<br>
+<br>
+<form  method="POST" action="LoginNewUserServlet">
+<Div Align="left">	<input type="submit" value="新規登録"></Div>
+</form>
+<br>
+</body>
+</html>

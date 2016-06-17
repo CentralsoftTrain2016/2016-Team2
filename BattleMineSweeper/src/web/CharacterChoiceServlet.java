@@ -1,0 +1,61 @@
+package web;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * Servlet implementation class CharacterChoiceServlet
+ */
+@WebServlet("/CharacterChoiceServlet")
+public class CharacterChoiceServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public CharacterChoiceServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+
+		String character = request.getParameter("character");
+
+		if (character == null || character.equals("")) {
+			String message = "選べ";
+			request.setAttribute("message", message);
+
+			RequestDispatcher disp = request.getRequestDispatcher("/character.jsp");
+			disp.forward(request, response);
+			return;
+		}
+
+		//【選んだキャラクターの情報をPLAYERテーブルに登録する】
+
+		RequestDispatcher disp = request.getRequestDispatcher("MatchingServlet");
+		disp.forward(request, response);
+	}
+
+}

@@ -1,0 +1,80 @@
+package web;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import domain.DictionaryItem;
+import domain.value.INFORMATIONDESCRIPTION;
+import service.WinnerResultInfoDescriptService;
+import service.bean.ResultBean;
+
+/**
+ * Servlet implementation class WinPlayerServlet
+ */
+@WebServlet("/WinnerResultServlet")
+public class WinnerResultServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public WinnerResultServlet() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		ResultBean wrb = (ResultBean) request.getAttribute("result");
+
+		// サービスをnew
+		WinnerResultInfoDescriptService wRIDS = null;
+		try {
+			wRIDS = new WinnerResultInfoDescriptService();
+			DictionaryItem dis = wRIDS.getInfoDescript();// WinnerResultInfoDescriptServiceのgetInfoDescript呼び出し
+
+			INFORMATIONDESCRIPTION infoDescript_p = dis.getDESCRIPTION();// DictionaryItemDao
+
+			wrb.setInfoDescription(infoDescript_p);// ResultBeanに図鑑を入れる
+		} catch (ClassNotFoundException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		} finally {
+			wRIDS.end();
+		}
+
+		//UserBean userBean = new UserBean();
+		// ResultBean resultBean = new ResultBean();
+		//wrb.setMyName(userBean.getUserName());
+		// 【地雷の知識を選ぶ処理がこのあたり？】
+		// resultBean.setInfoDescription(【地雷についての説明がはいる？】);
+		request.setAttribute("bean", wrb);
+		RequestDispatcher disp = request.getRequestDispatcher("/winnerResult.jsp");
+		disp.forward(request, response);
+	}
+
+}

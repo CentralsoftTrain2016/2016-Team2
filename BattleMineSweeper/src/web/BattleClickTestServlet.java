@@ -1,0 +1,211 @@
+package web;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import dao.Dao;
+import domain.ClickObjectTypeEnum;
+import domain.Mass;
+import domain.value.ClickPlayerID;
+import domain.value.GAMEID;
+import domain.value.MASSID;
+import domain.value.MASSLIST;
+import domain.value.PLAYERID;
+import net.arnx.jsonic.JSON;
+import service.ChangeTurnPlayerService;
+import service.bean.BattleClickBean;
+import service.bean.ClickResultBean;
+import service.bean.MassStateBean;
+import service.bean.MassUpdateBean;
+
+/**
+ * Servlet implementation class RevueAjaxServlet
+ */
+@WebServlet("/BattleClickTestServlet")
+public class BattleClickTestServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public BattleClickTestServlet() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		//セッションからクリックしたプレイヤーを取得
+		System.out.println((int)request.getSession().getAttribute("PLAYERID"));
+		ClickPlayerID clickPlayerID = new ClickPlayerID( (int)request.getSession().getAttribute("PLAYERID") );
+
+		String battleClickJson = (String) request.getParameter("battleClickBean");
+		System.out.println(battleClickJson);
+
+		BattleClickBean battleClickBean = JSON.decode(battleClickJson, BattleClickBean.class);
+
+		//if( !battleClickBean.getIsMyTurn() ) return;
+
+		MASSID massID = new MASSID(battleClickBean.getClickObjectNumber());
+		System.out.println(massID);
+		// GAMEID gameID = new GAMEID(battleClickBean.getGameObjectNumber())
+		//クリックしたものが何かを判別(マス or アイテム or スキル)
+		ClickObjectTypeEnum objectType = battleClickBean.getClickObjectType();
+		// ---------------------------------------------------------------------------
+		//ClickActionService clickActionService = null;
+		try {
+//			clickActionService = new ClickActionService();
+//			ClickResultBean clickResultBean = clickActionService.clickAction(massID, new GAMEID(1),clickPlayerID); //gameIDはセッションからとってくる！
+			//objectTypeに応じたクリック時処理へ、@return = ClickResultBean
+			ClickResultBean clickResultBean = objectType.clickAction(massID, new GAMEID(1),clickPlayerID,Dao.getConnection());
+			MASSLIST massList = clickResultBean.getMASSLIST();
+			List<Mass> list = massList.get();
+
+			MassStateBean massStateBean = new MassStateBean();
+
+			for (Mass ms : list) {
+				int massId = ms.getMASSID().get();
+				//String url = MassTypeEnum.MASSTYPE0.url;
+				String url = ms.getMassState().url;
+				MassUpdateBean massUpdateBean = new MassUpdateBean(massId, url);
+
+				// デバック用--------------------------------------------------
+				System.out.println(massUpdateBean.getMassNumber());
+				System.out.println(massUpdateBean.getUrl());
+
+				massStateBean.addMassUpdateBean(massUpdateBean);
+			}
+
+			Boolean isFinish = clickResultBean.getISFINISH().get();
+			if (isFinish) {
+
+				/*int winPlayerId = clickResultBean.getWINPLAYERID().get();
+				int losePlayerId = clickResultBean.getLosePlayerID().get();
+
+				int a = 1;
+				if(a == 1 ){
+					// 勝側のサーブレットに勝ったプレイヤーIDを渡す
+					request.getSession().setAttribute("winPlayerID", winPlayerId);
+					RequestDispatcher disp = request.getRequestDispatcher("/WinPlayerServlet");
+				}else if(a == 1){
+					// 負側のサーブレットに負けたプレイヤーIDを渡す
+					request.getSession().setAttribute("losePlayerID", losePlayerId);
+					RequestDispatcher disp = request.getRequestDispatcher("/LosePlayerServlet");
+				}
+				disp.forward(request, response);
+*/
+			} else {
+				PLAYERID playerID = new PLAYERID( (int)request.getSession().getAttribute("PLAYERID") );
+				ChangeTurnPlayerService ctps = new ChangeTurnPlayerService();
+				ctps.changeTurnPlayer(new GAMEID(1));
+				massStateBean.setIsMyTurn(ctps.checkTurnPlayer(new GAMEID(1), playerID).getIsMyTurn());
+
+				String massClickBean = JSON.encode(massStateBean);
+
+				System.out.println(massClickBean);
+				PrintWriter out = response.getWriter();
+				out.println(massClickBean);
+
+				return;
+			}
+		} catch (ClassNotFoundException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		//	objectType.rollebackEnd();
+			throw new RuntimeException(e);
+		} catch (SQLException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		//	objectType.rollebackEnd();
+			throw new RuntimeException(e);
+		} finally{
+		//	objectType.end();
+		}
+
+	}
+
+}
+
+
+
+
+//**********************************************************************************************
+/*
+ * String massJson = (String)request.getParameter("battleClickBean");//増すの名前が来る
+ * System.out.println(massJson);
+ *
+ * BattleClickBean mass = JSON.decode(massJson,BattleClickBean.class);
+ * System.out.println(mass.getClickObjectType());
+ *
+ *
+ * BattleClickBean mass = new BattleClickBean();
+ * mass.setClickObjectType(ClickObjectTypeEnum.MASS);
+ * mass.setClickObjectNumber(new ClickObjectNumber(1));
+ *
+ * String massClickBean = JSON.encode(mass); System.out.println(massClickBean);
+ *
+ * // System.out.println(mass.getClickObjectNumber().get());
+ *
+ * PrintWriter out = response.getWriter(); out.println(massClickBean);
+ *
+ * /* String str = mass.getName(); //名前を取ってくる int mass =
+ * Integer.parseInt(str.replaceAll("[^0-9]","")); // 数値の抽出
+ *
+ *
+ * ClickActionService clickActionService = new ClickActionService();
+ * MassClickResultBean massClickResultBean = clickActionService.MassOpen(mass);
+ * //リザルトビーン返ってくる
+ *
+ *
+ * //Enumからurlに MassState massState = new MassState(); massState.setUrl();
+ *
+ * Boolean fainalResult = massClickResultBean.getISFINISH(); if (fainalResult ==
+ * false){ //ResultSevletへ }else{ MassUpdate massupdate = new MassUpdate();
+ * String massClickBean = JSON.encode(massupdate); PrintWriter out =
+ * response.getWriter(); out.println(massClickBean);
+ *
+ * return;
+ *
+ * }
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * //JSON逆変換 /* ColorBean colorBean = JSON.decode(color,ColorBean.class);
+ *
+ * Color colorEnum = Color.valueOf(colorBean.getColorName()); //文字列からenum
+ *
+ * colorBean.setColorName(colorEnum.nextColor.name()); //次の色の名前をBeanへset
+ * colorBean.setColorCode(colorEnum.nextColor.colorCode);// 次の色のコードをBeanへset
+ *
+ * //JSON変換 String colorjson = JSON.encode(colorBean); //JSON形式の表示
+ * System.out.println(colorjson);
+ */
+// 値を返す
