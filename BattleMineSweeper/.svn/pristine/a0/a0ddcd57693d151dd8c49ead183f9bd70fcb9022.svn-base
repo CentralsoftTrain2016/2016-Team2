@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Quiz Time!</title>
+
+<style type="text/css"><!--
+body {
+	padding: 12px;
+}
+--></style>
+<script type="text/javascript"><!--
+var val = null;
+function yesDialog() {
+	val = "YES";
+	window.close();
+}
+function noDialog() {
+	val = "NO";
+	window.close();
+}
+function initialize() {
+	args = window.dialogArguments;
+	document.getElementById("quizStr").innerHTML=args[0];
+}
+function fin() {
+	window.returnValue = val;
+}
+--></script>
+</head>
+<body onload="initialize();" onunload="fin();">
+<center>
+<div id="quizStr"></div><br>
+<input type="button" value="YES" onclick="yesDialog();">　
+<input type="button" value="NO" onclick="noDialog();">
+</center>
+</body>
+</html>

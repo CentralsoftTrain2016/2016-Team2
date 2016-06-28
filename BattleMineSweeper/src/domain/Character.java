@@ -1,0 +1,46 @@
+package domain;
+
+import domain.value.CHARACTERID;
+import domain.value.CHARACTERNAME;
+import domain.value.SKILL;
+import domain.value.SKILLCOOLTIME;
+
+public class Character {
+
+	public CHARACTERID getCHARACTERID() {
+		return CHARACTERID;
+	}
+
+	public CHARACTERNAME getCHARACTERNAME() {
+		return CHARACTERNAME;
+	}
+
+	public SKILL getSKILL() {
+		return SKILL;
+	}
+
+	public SKILLCOOLTIME getSKILLCOOLTIME() {
+		return SKILLCOOLTIME;
+	}
+
+	public void setCHARACTERID(CHARACTERID cHARACTERID) {
+		CHARACTERID = cHARACTERID;
+	}
+
+	public void setCHARACTERNAME(CHARACTERNAME cHARACTERNAME) {
+		CHARACTERNAME = cHARACTERNAME;
+	}
+
+	public void setSKILL(SKILL sKILL) {
+		SKILL = sKILL;
+	}
+
+	public void setSKILLCOOLTIME(SKILLCOOLTIME sKILLCOOLTIME) {
+		SKILLCOOLTIME = sKILLCOOLTIME;
+	}
+
+	private CHARACTERID CHARACTERID;
+	private CHARACTERNAME CHARACTERNAME;
+	private SKILL SKILL;
+	private SKILLCOOLTIME SKILLCOOLTIME;
+}

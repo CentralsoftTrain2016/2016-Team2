@@ -1,0 +1,85 @@
+package service;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import dao.UsersDao;
+import domain.Users;
+
+/**
+ * USERSテーブルを用いてユーザの登録情報の確認・ユーザの情報の取得・ユーザの新規登録を行うためのサービスクラス
+ *
+ * @author junichi.furukawa
+ *
+ */
+public class LoginService extends Service {
+
+	/**
+	 * コンストラクタ
+	 *
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public LoginService() throws SQLException, ClassNotFoundException {
+		super();
+	}
+
+	/**
+	 * コンストラクタ
+	 *
+	 * @param connectService
+	 *
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public LoginService(Service connectService) throws SQLException, ClassNotFoundException {
+		super(connectService);
+	}
+
+	/**
+	 * コンストラクタ
+	 *
+	 * @param connection
+	 *
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public LoginService(Connection connection) throws SQLException, ClassNotFoundException {
+		super(connection);
+	}
+
+	/**
+	 * データベースからユーザを検索し、一致するものがあれば取得します。
+	 *
+	 * @param userName ユーザ名
+	 * @param password パスワード
+	 * @return ユーザ
+	 * @throws SQLException
+	 */
+	public Users loginUser(String userName, String password) throws SQLException {
+		UsersDao usersD = new UsersDao(con);
+		Users user = usersD.getUser(userName, password);
+		return user;
+	}
+
+	/**
+	 * データベースにユーザを新しく登録します。
+	 *
+	 * @param userName ユーザ名
+	 * @param password パスワード
+	 * @return ユーザ
+	 * @throws SQLException
+	 */
+	public Users registUser(String userName, String password) throws SQLException {
+		UsersDao usersD = new UsersDao(con);
+
+		Users user = usersD.checkUser(userName);
+		if (user == null) {
+			Users newuser = usersD.createUser(userName, password);
+			return newuser;
+		} else {
+			return null;
+		}
+
+	}
+}
